@@ -1,0 +1,13 @@
+global:
+  timeout: 30
+  webhook: "https://oapi.dingtalk.com/robot/send?access_token=YOUR_TOKEN_HERE"
+  interval: 60
+servers:
+  - host: "192.168.88.000"
+    port: 22
+    user: "user"
+    key_path: "C:/Users/YourName/.ssh/id_rsa" # 注意 Windows 路径如果是反斜杠可能需要转义，推荐用正斜杠 /
+    password: "YourPassword"
+tasks:
+  - name: "检查内存"
+    command: "free -m"
