@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-go-app-deployment
+spec:
+  replicas: 1               # 保持 1 个 Pod 存活
+  selector:
+    matchLabels:
+      app: my-go-app
+  template:
+    metadata:
+      labels:
+        app: my-go-app
+    spec:
+      containers:
+      - name: my-go-app-container
+        # 👇 只需要确保镜像是对的就行了！
+        image: ale09155/sentinel-monitor:latest 
+        imagePullPolicy: Always
+        # 端口声明？Service？统统不需要！

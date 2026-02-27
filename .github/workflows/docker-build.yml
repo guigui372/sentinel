@@ -1,32 +1,40 @@
 name: Build and Push Docker Image
 
-# 1. 触发机制：什么时候干活？
 on:
   push:
-    branches: [ "main" ]  # 只有推送到 main 分支时才触发
-  workflow_dispatch:      # 允许你在网页上点按钮手动触发（方便测试）
+    branches: [ "main" ]
+  workflow_dispatch:
 
-# 2. 任务列表：谁来干？在哪干？
 jobs:
+  # --- 任务 1: 构建并推送到 Docker Hub (CI) ---
   build-and-push:
-    runs-on: ubuntu-latest  # 给我在 GitHub 的服务器上开一台 Ubuntu 虚拟机
-
-    # 3. 具体步骤：一步步怎么做？
+    runs-on: ubuntu-latest
     steps:
-      # 第一步：把你的代码从 GitHub 仓库里“拉”下来
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 第二步：登录 Docker Hub (用我们之前存的秘密)
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 第三步：构建并推送镜像
-      # 这里我特意用了你熟悉的命令形式，让你看懂它在干嘛
       - name: Build and Push
         run: |
+          # 注意：这里假设你的 Dockerfile 在根目录
           docker build -t ${{ secrets.DOCKER_USERNAME }}/sentinel-monitor:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/sentinel-monitor:latest
+
+  # --- 任务 2: 部署到服务器 (CD) ---
+  deploy-to-k8s:
+    needs: build-and-push # 必须等 CI 阶段成功了才执行
+    runs-on: self-hosted  # 🌟【魔法核心】呼叫你虚拟机里的卧底！
+    steps:
+    - name: 检出代码 (卧底把带有 k8s-deploy.yaml 的代码拉到虚拟机里)
+      uses: actions/checkout@v3
+
+    - name: 部署到 K3s 集群！
+      # 卧底代替你，敲下 kubectl apply 命令！
+      run: |
+        kubectl apply -f k8s-deploy.yaml
+        kubectl rollout restart deployment my-go-app-deployment
