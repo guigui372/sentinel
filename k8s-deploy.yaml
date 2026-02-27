@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: my-go-app-deployment
 spec:
-  replicas: 1               # 保持 1 个 Pod 存活
+  replicas: 1
   selector:
     matchLabels:
       app: my-go-app
@@ -14,7 +14,16 @@ spec:
     spec:
       containers:
       - name: my-go-app-container
-        # 👇 只需要确保镜像是对的就行了！
         image: ale09155/sentinel-monitor:latest 
         imagePullPolicy: Always
-        # 端口声明？Service？统统不需要！
+        # 👇【动作】：包工头，把下面那个叫 app-config 的 U 盘，插到容器的 /root/ 目录下！
+        volumeMounts:
+        - name: app-config-volume       # 对应下面 U 盘的名字
+          mountPath: /root/config.yaml  # 你的 Go 程序去哪里找配置文件，这里就填哪里！
+          subPath: config.yaml          # 只挂载文件本身，不覆盖整个文件夹
+      
+      # 👇【声明】：包工头，我要定义一个叫 app-config 的 U 盘，它的内容来自名叫 my-go-app-config 的 ConfigMap！
+      volumes:
+      - name: app-config-volume
+        configMap:
+          name: my-go-app-config        # 这是你在 K3s 主脑上用 kubectl create configmap 命令创建的名字
