@@ -19,7 +19,7 @@ spec:
         # 👇【动作】：包工头，把下面那个叫 app-config 的 U 盘，插到容器的 /root/ 目录下！
         volumeMounts:
         - name: app-config-volume       # 对应下面 U 盘的名字
-          mountPath: /root/config.yaml  # 你的 Go 程序去哪里找配置文件，这里就填哪里！
+          mountPath: /root/configs/config.yaml  # 你的 Go 程序去哪里找配置文件，这里就填哪里！
           subPath: config.yaml          # 只挂载文件本身，不覆盖整个文件夹
       
       # 👇【声明】：包工头，我要定义一个叫 app-config 的 U 盘，它的内容来自名叫 my-go-app-config 的 ConfigMap！
